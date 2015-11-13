@@ -31,7 +31,7 @@ func processImage(i image.Image) string {
 		}
 	}
 	med /= 64 * 48
-	med *= 0.8 // because meh.
+	med *= 0.7 // because meh.
 
 	for y := 0; y < 48; y++ {
 		for x := 0; x < 64; x++ {
