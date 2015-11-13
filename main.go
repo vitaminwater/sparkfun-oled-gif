@@ -10,6 +10,7 @@ import (
 	"os"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/nfnt/resize"
 )
 
 // 64 x 48
@@ -17,16 +18,14 @@ import (
 func processImage(i image.Image) string {
 	screen := [384]uint8{}
 	bounds := i.Bounds()
-	width := bounds.Max.X - bounds.Min.X
-	height := bounds.Max.Y - bounds.Min.Y
-	xr := float64(64) / float64(width)
-	yr := float64(48) / float64(height)
+
+	i = resize.Resize(64, 48, i, resize.MitchellNetravali)
 
 	// calculate medium pixel color, as a treshold between on and off for pixels
 	med := float64(0)
 	for y := 0; y < 48; y++ {
 		for x := 0; x < 64; x++ {
-			c := i.At(bounds.Min.X+int(float64(x)/xr), bounds.Min.Y+int(float64(y)/yr))
+			c := i.At(bounds.Min.X+x, bounds.Min.Y+y)
 			r, g, b, _ := c.RGBA()
 			med += float64(r+g+b) / 3
 		}
@@ -36,7 +35,7 @@ func processImage(i image.Image) string {
 
 	for y := 0; y < 48; y++ {
 		for x := 0; x < 64; x++ {
-			c := i.At(bounds.Min.X+int(float64(x)/xr), bounds.Min.Y+int(float64(y)/yr))
+			c := i.At(bounds.Min.X+x, bounds.Min.Y+y)
 			r, g, b, _ := c.RGBA()
 			on := float64(r+g+b)/3 > med
 			if on {
