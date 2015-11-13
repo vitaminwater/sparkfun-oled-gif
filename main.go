@@ -77,7 +77,7 @@ func main() {
 
 	f.Seek(0, 0)
 
-	cMatrix := "uint8_t bender [][384] = {{\n\t"
+	fmt.Print("uint8_t bender [][384] = {{\n\t")
 	if t == "image/gif" {
 		g, err := gif.DecodeAll(f)
 		if err != nil {
@@ -85,17 +85,16 @@ func main() {
 		}
 		for n, i := range g.Image {
 			if n != 0 {
-				cMatrix += "},\n{"
+				fmt.Print("},\n{")
 			}
-			cMatrix += processImage(i)
+			fmt.Print(processImage(i))
 		}
 	} else if t != "application/octet-stream" {
 		i, _, err := image.Decode(f)
 		if err != nil {
 			log.Fatal(err)
 		}
-		cMatrix += processImage(i)
+		fmt.Print(processImage(i))
 	}
-	cMatrix += "}};"
-	fmt.Println(cMatrix)
+	fmt.Print("}};")
 }
