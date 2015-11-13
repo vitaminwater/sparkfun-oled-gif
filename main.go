@@ -58,14 +58,18 @@ func processImage(i image.Image) string {
 }
 
 func main() {
-	f, err := os.Open("test2.gif")
+	if len(os.Args) != 2 {
+		log.Fatalf("Usage: %s image.ext", os.Args[0])
+	}
+
+	f, err := os.Open(os.Args[1])
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	header := [512]byte{}
 	if _, err := f.Read(header[:]); err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	t := http.DetectContentType(header[:])
@@ -77,7 +81,7 @@ func main() {
 	if t == "image/gif" {
 		g, err := gif.DecodeAll(f)
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 		for n, i := range g.Image {
 			if n != 0 {
@@ -88,7 +92,7 @@ func main() {
 	} else if t != "application/octet-stream" {
 		i, _, err := image.Decode(f)
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 		cMatrix += processImage(i)
 	}
