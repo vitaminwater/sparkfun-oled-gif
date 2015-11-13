@@ -21,11 +21,24 @@ func processImage(i image.Image) string {
 	height := bounds.Max.Y - bounds.Min.Y
 	xr := float64(64) / float64(width)
 	yr := float64(48) / float64(height)
+
+	// calculate medium pixel color, as a treshold between on and off for pixels
+	med := float64(0)
 	for y := 0; y < 48; y++ {
 		for x := 0; x < 64; x++ {
 			c := i.At(bounds.Min.X+int(float64(x)/xr), bounds.Min.Y+int(float64(y)/yr))
 			r, g, b, _ := c.RGBA()
-			on := int(float64(r+g+b)/3) > 0xffff/3
+			med += float64(r+g+b) / 3
+		}
+	}
+	med /= 64 * 48
+	med *= 0.8 // because meh.
+
+	for y := 0; y < 48; y++ {
+		for x := 0; x < 64; x++ {
+			c := i.At(bounds.Min.X+int(float64(x)/xr), bounds.Min.Y+int(float64(y)/yr))
+			r, g, b, _ := c.RGBA()
+			on := float64(r+g+b)/3 > med
 			if on {
 				screen[x+(y/8)*64] |= 1 << uint(y%8)
 			}
